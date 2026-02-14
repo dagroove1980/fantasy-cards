@@ -13,9 +13,9 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const { getFantasyMovies } = await import('@/lib/tmdb');
-  const { results } = await getFantasyMovies(1);
-  return results.slice(0, 50).map((m) => ({ id: String(m.id) }));
+  const { getFantasyMoviesMultiPage } = await import('@/lib/tmdb');
+  const movies = await getFantasyMoviesMultiPage(5);
+  return movies.slice(0, 100).map((m) => ({ id: String(m.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -108,6 +108,9 @@ export default async function MoviePage({ params }: Props) {
               <p className="italic text-accent mt-4">"{movie.tagline}"</p>
             )}
             <p className="text-foreground/90 mt-4 leading-relaxed">{movie.overview}</p>
+            <p className="text-foreground/80 mt-6 text-sm">
+              Explore more fantasy movies in our curated collection. Filter by genre, rating, or decade.
+            </p>
           </div>
         </div>
       </div>

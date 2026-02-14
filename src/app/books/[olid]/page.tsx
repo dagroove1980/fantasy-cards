@@ -13,10 +13,12 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const { getFantasyBooks } = await import('@/lib/openlibrary');
-  const { workId } = await import('@/lib/openlibrary');
-  const { docs } = await getFantasyBooks('fantasy', 1, 30);
-  return docs.map((b) => ({ olid: workId(b.key) }));
+  const { getFantasyBooksMultiSubject, workId } = await import('@/lib/openlibrary');
+  const books = await getFantasyBooksMultiSubject(
+    ['fantasy', 'high_fantasy', 'epic_fantasy'],
+    50
+  );
+  return books.slice(0, 150).map((b) => ({ olid: workId(b.key) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -124,6 +126,9 @@ export default async function BookPage({ params }: Props) {
                 {book.description}
               </p>
             )}
+            <p className="text-foreground/80 mt-6 text-sm">
+              Discover more fantasy books. Browse by sub-genre, author, or decade.
+            </p>
           </div>
         </div>
       </div>

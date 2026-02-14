@@ -60,6 +60,31 @@ export async function getFantasyBooks(
   });
 }
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Fetch fantasy books from multiple subjects and merge (larger catalog) */
+export async function getFantasyBooksMultiSubject(
+  subjects: string[],
+  limitPerSubject = 50
+): Promise<OpenLibraryBook[]> {
+  const all: OpenLibraryBook[] = [];
+  const seen = new Set<string>();
+
+  for (let i = 0; i < subjects.length; i++) {
+    if (i > 0) await delay(500); // Throttle to avoid Open Library 429
+    const res = await getFantasyBooks(subjects[i], 1, limitPerSubject);
+    for (const doc of res.docs) {
+      const id = doc.key;
+      if (!seen.has(id)) {
+        seen.add(id);
+        all.push(doc);
+      }
+    }
+  }
+
+  return all;
+}
+
 /** Search books */
 export async function searchBooks(
   query: string,

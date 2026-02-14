@@ -1,13 +1,15 @@
 import { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/constants';
-import { getFantasyMovies } from '@/lib/tmdb';
-import { getFantasyBooks, workId } from '@/lib/openlibrary';
+import { getFantasyMoviesMultiPage } from '@/lib/tmdb';
+import { getFantasyBooksMultiSubject, workId } from '@/lib/openlibrary';
+import { FANTASY_SUBJECTS } from '@/lib/constants';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [moviesRes, booksRes] = await Promise.all([
-    getFantasyMovies(1),
-    getFantasyBooks('fantasy', 1, 100),
-  ]);
+  const movies = await getFantasyMoviesMultiPage(5);
+  const books = await getFantasyBooksMultiSubject(
+    ['fantasy', 'high_fantasy', 'epic_fantasy'],
+    40
+  );
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
@@ -16,14 +18,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/search`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
   ];
 
-  const moviePages = moviesRes.results.map((m) => ({
+  const moviePages = movies.map((m) => ({
     url: `${SITE_URL}/movies/${m.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }));
 
-  const bookPages = booksRes.docs.map((b) => ({
+  const bookPages = books.map((b) => ({
     url: `${SITE_URL}/books/${workId(b.key)}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,

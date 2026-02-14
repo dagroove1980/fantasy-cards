@@ -69,6 +69,48 @@ export async function getFantasyMovies(page = 1): Promise<TMDBSearchResponse<TMD
   });
 }
 
+/** Fetch multiple pages of fantasy movies for larger catalog */
+export async function getFantasyMoviesMultiPage(pages = 5): Promise<TMDBMovie[]> {
+  const all: TMDBMovie[] = [];
+  const seen = new Set<number>();
+
+  for (let p = 1; p <= pages; p++) {
+    const res = await getFantasyMovies(p);
+    for (const m of res.results) {
+      if (!seen.has(m.id)) {
+        seen.add(m.id);
+        all.push(m);
+      }
+    }
+    if (p >= res.total_pages) break;
+  }
+
+  return all;
+}
+
+/** Fetch fantasy movies with optional API-level filters */
+export async function getFantasyMoviesFiltered(options: {
+  genreIds?: number[];
+  yearFrom?: number;
+  yearTo?: number;
+  minRating?: number;
+  page?: number;
+}): Promise<TMDBSearchResponse<TMDBMovie>> {
+  const params: Record<string, string | number> = {
+    with_genres: options.genreIds?.length
+      ? options.genreIds.join(',')
+      : TMDB_FANTASY_GENRE_ID,
+    sort_by: 'popularity.desc',
+    page: options.page ?? 1,
+  };
+  if (options.yearFrom)
+    params['primary_release_date.gte'] = `${options.yearFrom}-01-01`;
+  if (options.yearTo)
+    params['primary_release_date.lte'] = `${options.yearTo}-12-31`;
+  if (options.minRating != null) params['vote_average.gte'] = options.minRating;
+  return tmdbFetch('/discover/movie', params);
+}
+
 /** Fetch single movie by ID */
 export async function getMovieById(id: string): Promise<TMDBMovieDetail | null> {
   try {

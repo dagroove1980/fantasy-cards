@@ -9,6 +9,25 @@ export const SITE_DESCRIPTION =
 // TMDB Fantasy genre ID
 export const TMDB_FANTASY_GENRE_ID = 14;
 
+// Fantasy sub-genres for books (Open Library subjects)
+export const FANTASY_SUBJECTS = [
+  'fantasy',
+  'high_fantasy',
+  'epic_fantasy',
+  'dark_fantasy',
+  'urban_fantasy',
+  'fantasy_fiction',
+] as const;
+
+export const subjectLabels: Record<string, string> = {
+  fantasy: 'Fantasy',
+  high_fantasy: 'High Fantasy',
+  epic_fantasy: 'Epic Fantasy',
+  dark_fantasy: 'Dark Fantasy',
+  urban_fantasy: 'Urban Fantasy',
+  fantasy_fiction: 'Fantasy Fiction',
+};
+
 // TMDB genre labels
 export const genreLabels: Record<number, string> = {
   12: 'Adventure',
