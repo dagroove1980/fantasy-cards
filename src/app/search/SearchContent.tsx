@@ -5,7 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { MovieCard } from '@/components/MovieCard';
 import { BookCard } from '@/components/BookCard';
+import { TVCard } from '@/components/TVCard';
 import type { TMDBMovie } from '@/lib/tmdb';
+import type { TMDBSeries } from '@/lib/tmdb';
 import type { OpenLibraryBook } from '@/lib/openlibrary';
 
 export function SearchContent() {
@@ -15,6 +17,7 @@ export function SearchContent() {
   const [results, setResults] = useState<{
     movies: TMDBMovie[];
     books: OpenLibraryBook[];
+    tv: TMDBSeries[];
   } | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -29,6 +32,7 @@ export function SearchContent() {
       setResults({
         movies: res.results || [],
         books: res.docs || [],
+        tv: res.tv || [],
       });
     });
   };
@@ -45,7 +49,7 @@ export function SearchContent() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search movies and books..."
+            placeholder="Search movies, TV shows, and books..."
             className="flex-1 px-4 py-3 rounded-lg bg-card border border-border text-foreground placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
           />
           <button
@@ -75,6 +79,16 @@ export function SearchContent() {
               </div>
             </section>
           )}
+          {results.tv && results.tv.length > 0 && (
+            <section className="mb-12">
+              <h2 className="font-heading text-xl font-bold mb-4">TV Shows</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {results.tv.map((s) => (
+                  <TVCard key={s.id} series={s} />
+                ))}
+              </div>
+            </section>
+          )}
           {results.books.length > 0 && (
             <section>
               <h2 className="font-heading text-xl font-bold mb-4">Books</h2>
@@ -85,7 +99,7 @@ export function SearchContent() {
               </div>
             </section>
           )}
-          {results.movies.length === 0 && results.books.length === 0 && (
+          {results.movies.length === 0 && (!results.tv || results.tv.length === 0) && results.books.length === 0 && (
             <p className="text-secondary">
               No results found for &quot;{query}&quot;
             </p>
@@ -95,7 +109,7 @@ export function SearchContent() {
 
       {!results && !initialQuery && (
         <p className="text-secondary">
-          Enter a search term to find movies and books.
+          Enter a search term to find movies, TV shows, and books.
         </p>
       )}
     </div>

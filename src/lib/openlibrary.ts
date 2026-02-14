@@ -100,6 +100,30 @@ export async function searchBooks(
   });
 }
 
+/** Get related books by same subject (excluding current work) */
+export async function getRelatedBooks(
+  olid: string,
+  limit = 12
+): Promise<OpenLibraryBook[]> {
+  const book = await getBookByWorkId(olid);
+  if (!book || !book.subjects?.length) return [];
+
+  const currentKey = `/works/${olid}`;
+  const subject = book.subjects[0];
+  const res = await getFantasyBooks(subject, 1, limit + 5);
+  const seen = new Set<string>([currentKey]);
+  const related: OpenLibraryBook[] = [];
+  for (const doc of res.docs) {
+    if (related.length >= limit) break;
+    const id = doc.key;
+    if (!seen.has(id)) {
+      seen.add(id);
+      related.push(doc);
+    }
+  }
+  return related;
+}
+
 /** Get work details */
 export async function getBookByWorkId(
   workId: string

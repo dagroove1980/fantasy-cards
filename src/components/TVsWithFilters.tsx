@@ -2,18 +2,18 @@
 
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { MovieCard } from '@/components/MovieCard';
-import { MovieFilters } from '@/components/MovieFilters';
-import type { TMDBMovie } from '@/lib/tmdb';
+import { TVCard } from '@/components/TVCard';
+import { TVFilters } from '@/components/TVFilters';
+import type { TMDBSeries } from '@/lib/tmdb';
 import { ChevronDown } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 24;
 
-interface MoviesWithFiltersProps {
-  movies: TMDBMovie[];
+interface TVsWithFiltersProps {
+  series: TMDBSeries[];
 }
 
-export function MoviesWithFilters({ movies }: MoviesWithFiltersProps) {
+export function TVsWithFilters({ series }: TVsWithFiltersProps) {
   const searchParams = useSearchParams();
   const [showCount, setShowCount] = useState(ITEMS_PER_PAGE);
 
@@ -23,21 +23,23 @@ export function MoviesWithFilters({ movies }: MoviesWithFiltersProps) {
   const sort = searchParams.get('sort') || 'popularity';
 
   const filtered = useMemo(() => {
-    let result = movies;
+    let result = series;
 
     if (genre) {
       const gId = parseInt(genre, 10);
-      result = result.filter((m) => m.genre_ids.includes(gId));
+      result = result.filter((s) => s.genre_ids.includes(gId));
     }
     if (minRating) {
       const min = parseFloat(minRating);
-      result = result.filter((m) => m.vote_average >= min);
+      result = result.filter((s) => s.vote_average >= min);
     }
     if (decade) {
       const yearStart = parseInt(decade, 10);
       const yearEnd = yearStart + 9;
-      result = result.filter((m) => {
-        const y = m.release_date ? parseInt(m.release_date.slice(0, 4), 10) : 0;
+      result = result.filter((s) => {
+        const y = s.first_air_date
+          ? parseInt(s.first_air_date.slice(0, 4), 10)
+          : 0;
         return y >= yearStart && y <= yearEnd;
       });
     }
@@ -48,32 +50,32 @@ export function MoviesWithFilters({ movies }: MoviesWithFiltersProps) {
         sorted.sort((a, b) => b.vote_average - a.vote_average);
         break;
       case 'year':
-        sorted.sort((a, b) => (b.release_date || '').localeCompare(a.release_date || ''));
+        sorted.sort((a, b) => (b.first_air_date || '').localeCompare(a.first_air_date || ''));
         break;
       case 'year-asc':
-        sorted.sort((a, b) => (a.release_date || '').localeCompare(b.release_date || ''));
+        sorted.sort((a, b) => (a.first_air_date || '').localeCompare(b.first_air_date || ''));
         break;
       case 'title':
-        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
         break;
       default:
         break;
     }
     return sorted;
-  }, [movies, genre, minRating, decade, sort]);
+  }, [series, genre, minRating, decade, sort]);
 
   const displayed = filtered.slice(0, showCount);
   const hasMore = showCount < filtered.length;
 
   return (
     <>
-      <MovieFilters movies={movies} />
+      <TVFilters series={series} />
       <p className="text-sm text-secondary mb-6">
-        Showing {displayed.length} of {filtered.length} movies
+        Showing {displayed.length} of {filtered.length} shows
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {displayed.map((m) => (
-          <MovieCard key={m.id} movie={m} />
+        {displayed.map((s) => (
+          <TVCard key={s.id} series={s} />
         ))}
       </div>
       {hasMore && (

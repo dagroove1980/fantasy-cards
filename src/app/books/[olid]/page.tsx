@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getBookByWorkId } from '@/lib/openlibrary';
-import { coverUrl } from '@/lib/openlibrary';
+import { getBookByWorkId, getRelatedBooks, coverUrl, workId } from '@/lib/openlibrary';
 import { bookMetaTitle, bookMetaDescription, bookStructuredData, breadcrumbStructuredData } from '@/lib/seo';
 import { SITE_URL } from '@/lib/constants';
 import type { Metadata } from 'next';
@@ -43,7 +42,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BookPage({ params }: Props) {
   const { olid } = await params;
-  const book = await getBookByWorkId(olid);
+  const [book, related] = await Promise.all([
+    getBookByWorkId(olid),
+    getRelatedBooks(olid).catch(() => []),
+  ]);
   if (!book) notFound();
 
   const cover = book.covers?.[0]
@@ -131,6 +133,54 @@ export default async function BookPage({ params }: Props) {
             </p>
           </div>
         </div>
+
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="font-heading text-xl font-semibold text-foreground mb-4">
+              More like this
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {related.map((b) => {
+                const cov = coverUrl(b.cover_i, 'M');
+                const bid = workId(b.key);
+                const author = b.author_name?.[0] || '';
+                const year = b.first_publish_year?.toString() || '';
+                return (
+                  <Link
+                    key={b.key}
+                    href={`/books/${bid}`}
+                    className="group rounded-[var(--radius-card)] overflow-hidden border border-border hover:border-accent/50 transition-colors"
+                  >
+                    <div className="relative aspect-[2/3] bg-card">
+                      {cov ? (
+                        <Image
+                          src={cov}
+                          alt={b.title}
+                          fill
+                          sizes="150px"
+                          className="object-cover object-top group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-secondary text-sm p-2 text-center">
+                          {b.title}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-2">
+                      <h3 className="font-heading font-medium text-foreground text-sm line-clamp-2 group-hover:text-accent">
+                        {b.title}
+                      </h3>
+                      <p className="text-xs text-secondary line-clamp-1">
+                        {author}
+                        {year ? ` (${year})` : ''}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </>
   );

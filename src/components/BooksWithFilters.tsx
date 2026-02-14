@@ -20,6 +20,7 @@ export function BooksWithFilters({ books }: BooksWithFiltersProps) {
   const subject = searchParams.get('subject') || '';
   const author = searchParams.get('author') || '';
   const decade = searchParams.get('decade') || '';
+  const sort = searchParams.get('sort') || 'popularity';
 
   const filtered = useMemo(() => {
     let result = books;
@@ -44,8 +45,22 @@ export function BooksWithFilters({ books }: BooksWithFiltersProps) {
       });
     }
 
-    return result;
-  }, [books, subject, author, decade]);
+    const sorted = [...result];
+    switch (sort) {
+      case 'year':
+        sorted.sort((a, b) => (b.first_publish_year ?? 0) - (a.first_publish_year ?? 0));
+        break;
+      case 'year-asc':
+        sorted.sort((a, b) => (a.first_publish_year ?? 0) - (b.first_publish_year ?? 0));
+        break;
+      case 'title':
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      default:
+        break;
+    }
+    return sorted;
+  }, [books, subject, author, decade, sort]);
 
   const displayed = filtered.slice(0, showCount);
   const hasMore = showCount < filtered.length;

@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { Film, Book, ChevronRight } from 'lucide-react';
-import { getFantasyMovies } from '@/lib/tmdb';
+import { Film, Book, Tv, ChevronRight } from 'lucide-react';
+import { getFantasyMovies, getFantasyTV } from '@/lib/tmdb';
 import { getFantasyBooks } from '@/lib/openlibrary';
 import { MovieCard } from '@/components/MovieCard';
 import { BookCard } from '@/components/BookCard';
+import { TVCard } from '@/components/TVCard';
 import { SITE_NAME, SITE_URL } from '@/lib/constants';
 
 export const revalidate = 3600; // 1 hour
@@ -19,13 +20,15 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const [moviesRes, booksRes] = await Promise.all([
+  const [moviesRes, booksRes, tvRes] = await Promise.all([
     getFantasyMovies(1),
-    getFantasyBooks('fantasy', 1, 12),
+    getFantasyBooks('fantasy', 1, 8),
+    getFantasyTV(1),
   ]);
 
   const movies = moviesRes.results.slice(0, 12);
-  const books = booksRes.docs.slice(0, 12);
+  const books = booksRes.docs.slice(0, 8);
+  const series = tvRes.results.slice(0, 8);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -61,6 +64,27 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
           {movies.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
+          ))}
+        </div>
+      </section>
+
+      {/* TV Shows */}
+      <section className="mb-16">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-heading text-2xl font-bold flex items-center gap-2">
+            <Tv size={28} className="text-accent" />
+            Fantasy TV Shows
+          </h2>
+          <Link
+            href="/tv"
+            className="text-sm text-accent hover:underline flex items-center gap-1"
+          >
+            View all <ChevronRight size={16} />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+          {series.map((s) => (
+            <TVCard key={s.id} series={s} />
           ))}
         </div>
       </section>

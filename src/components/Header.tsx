@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search, Book, Film } from 'lucide-react';
+import { Search, Book, Film, Tv } from 'lucide-react';
 
 export function Header() {
   return (
@@ -28,6 +28,13 @@ export function Header() {
             >
               <Book size={18} />
               Books
+            </Link>
+            <Link
+              href="/tv"
+              className="flex items-center gap-1.5 hover:text-foreground transition-colors"
+            >
+              <Tv size={18} />
+              TV
             </Link>
             <Link
               href="/search"

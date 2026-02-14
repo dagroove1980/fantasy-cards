@@ -41,6 +41,7 @@ export function MovieFilters({ movies }: MovieFiltersProps) {
   const genre = searchParams.get('genre') || '';
   const minRating = searchParams.get('minRating') || '';
   const decade = searchParams.get('decade') || '';
+  const sort = searchParams.get('sort') || 'popularity';
 
   const genres = getAllGenresFromMovies(movies);
   const hasActive = genre || minRating || decade;
@@ -111,6 +112,20 @@ export function MovieFilters({ movies }: MovieFiltersProps) {
                 {o.label}
               </option>
             ))}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-secondary block mb-1">Sort by</label>
+          <select
+            value={sort}
+            onChange={(e) => updateFilter('sort', e.target.value)}
+            className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm"
+          >
+            <option value="popularity">Popularity</option>
+            <option value="rating">Rating</option>
+            <option value="year">Year (newest)</option>
+            <option value="year-asc">Year (oldest)</option>
+            <option value="title">Title A–Z</option>
           </select>
         </div>
       </div>

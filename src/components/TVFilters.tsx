@@ -1,9 +1,16 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FANTASY_SUBJECTS, subjectLabels } from '@/lib/constants';
-import type { OpenLibraryBook } from '@/lib/openlibrary';
+import { genreLabels } from '@/lib/constants';
+import type { TMDBSeries } from '@/lib/tmdb';
 import { Filter, X } from 'lucide-react';
+
+const RATING_OPTIONS = [
+  { value: '', label: 'Any rating' },
+  { value: '6', label: '6+ stars' },
+  { value: '7', label: '7+ stars' },
+  { value: '8', label: '8+ stars' },
+];
 
 const DECADES = [
   { value: '', label: 'Any year' },
@@ -12,42 +19,41 @@ const DECADES = [
   { value: '2000', label: '2000s' },
   { value: '1990', label: '1990s' },
   { value: '1980', label: '1980s' },
-  { value: '1970', label: '1970s' },
 ];
 
-function getAllAuthorsFromBooks(books: OpenLibraryBook[]): string[] {
-  const set = new Set<string>();
-  for (const b of books) {
-    for (const a of b.author_name || []) {
-      if (a.trim()) set.add(a);
+function getAllGenresFromShows(shows: TMDBSeries[]): number[] {
+  const set = new Set<number>();
+  for (const s of shows) {
+    for (const g of s.genre_ids) {
+      if (genreLabels[g]) set.add(g);
     }
   }
-  return Array.from(set).sort().slice(0, 30);
+  return Array.from(set).sort();
 }
 
-interface BookFiltersProps {
-  books: OpenLibraryBook[];
+interface TVFiltersProps {
+  series: TMDBSeries[];
 }
 
-export function BookFilters({ books }: BookFiltersProps) {
+export function TVFilters({ series }: TVFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subject = searchParams.get('subject') || '';
-  const author = searchParams.get('author') || '';
+  const genre = searchParams.get('genre') || '';
+  const minRating = searchParams.get('minRating') || '';
   const decade = searchParams.get('decade') || '';
   const sort = searchParams.get('sort') || 'popularity';
 
-  const authors = getAllAuthorsFromBooks(books);
-  const hasActive = subject || author || decade;
+  const genres = getAllGenresFromShows(series);
+  const hasActive = genre || minRating || decade;
 
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
     if (value) params.set(key, value);
     else params.delete(key);
-    router.push(`/books?${params.toString()}`);
+    router.push(`/tv?${params.toString()}`);
   };
 
-  const clearFilters = () => router.push('/books');
+  const clearFilters = () => router.push('/tv');
 
   return (
     <div className="mb-8 p-4 rounded-lg bg-card border border-border">
@@ -66,31 +72,30 @@ export function BookFilters({ books }: BookFiltersProps) {
       </div>
       <div className="flex flex-wrap gap-4">
         <div>
-          <label className="text-xs text-secondary block mb-1">Sub-genre</label>
+          <label className="text-xs text-secondary block mb-1">Genre</label>
           <select
-            value={subject}
-            onChange={(e) => updateFilter('subject', e.target.value)}
-            className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm min-w-[140px]"
+            value={genre}
+            onChange={(e) => updateFilter('genre', e.target.value)}
+            className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm"
           >
-            <option value="">All fantasy</option>
-            {FANTASY_SUBJECTS.map((s) => (
-              <option key={s} value={s}>
-                {subjectLabels[s] || s}
+            <option value="">All</option>
+            {genres.map((id) => (
+              <option key={id} value={id}>
+                {genreLabels[id]}
               </option>
             ))}
           </select>
         </div>
         <div>
-          <label className="text-xs text-secondary block mb-1">Author</label>
+          <label className="text-xs text-secondary block mb-1">Rating</label>
           <select
-            value={author}
-            onChange={(e) => updateFilter('author', e.target.value)}
-            className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm min-w-[180px]"
+            value={minRating}
+            onChange={(e) => updateFilter('minRating', e.target.value)}
+            className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm"
           >
-            <option value="">Any author</option>
-            {authors.map((a) => (
-              <option key={a} value={a}>
-                {a}
+            {RATING_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
               </option>
             ))}
           </select>
@@ -117,6 +122,7 @@ export function BookFilters({ books }: BookFiltersProps) {
             className="px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-sm"
           >
             <option value="popularity">Popularity</option>
+            <option value="rating">Rating</option>
             <option value="year">Year (newest)</option>
             <option value="year-asc">Year (oldest)</option>
             <option value="title">Title A–Z</option>
