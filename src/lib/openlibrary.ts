@@ -7,10 +7,14 @@ export interface OpenLibraryBook {
   first_publish_year?: number;
   cover_i?: number;
   author_name?: string[];
+  author_key?: string[];
   subject?: string[];
   isbn?: string[];
   edition_count?: number;
   number_of_pages_median?: number;
+  ratings_average?: number;
+  ratings_count?: number;
+  ebook_access?: string;
 }
 
 export interface OpenLibrarySearchResponse {
@@ -29,6 +33,8 @@ export function workId(key: string): string {
   return key.replace('/works/', '');
 }
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function olFetch<T>(path: string, params?: Record<string, string | number>): Promise<T> {
   const url = new URL(`${OL_BASE}${path}`);
   if (params) {
@@ -37,11 +43,23 @@ async function olFetch<T>(path: string, params?: Record<string, string | number>
     }
   }
 
-  const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) throw new Error(`Open Library API error: ${res.status}`);
-  return res.json();
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 3600 },
+    });
+    if (res.ok) return res.json();
+
+    if (res.status === 429) {
+      const waitMs = Math.min(3000 * Math.pow(2, attempt), 15000);
+      await delay(waitMs);
+      lastError = new Error(`Open Library API error: ${res.status}`);
+      continue;
+    }
+
+    throw new Error(`Open Library API error: ${res.status}`);
+  }
+  throw lastError ?? new Error('Open Library API error');
 }
 
 /** Fetch fantasy books by subject */
@@ -55,12 +73,10 @@ export async function getFantasyBooks(
     subject,
     limit,
     offset,
-    fields: 'key,title,first_publish_year,cover_i,author_name,subject',
+    fields: 'key,title,first_publish_year,cover_i,author_name,author_key,subject,edition_count,number_of_pages_median,ratings_average,ratings_count,ebook_access',
     sort: 'rating desc',
   });
 }
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Fetch fantasy books from multiple subjects and merge (larger catalog) */
 export async function getFantasyBooksMultiSubject(
@@ -71,7 +87,7 @@ export async function getFantasyBooksMultiSubject(
   const seen = new Set<string>();
 
   for (let i = 0; i < subjects.length; i++) {
-    if (i > 0) await delay(1200); // Throttle to avoid Open Library 429
+    if (i > 0) await delay(2000); // Throttle to avoid Open Library 429
     const res = await getFantasyBooks(subjects[i], 1, limitPerSubject);
     for (const doc of res.docs) {
       const id = doc.key;
@@ -96,7 +112,7 @@ export async function searchBooks(
     q: query,
     limit,
     offset,
-    fields: 'key,title,first_publish_year,cover_i,author_name,subject',
+    fields: 'key,title,first_publish_year,cover_i,author_name,author_key,subject,edition_count,number_of_pages_median,ratings_average,ratings_count,ebook_access',
   });
 }
 
@@ -124,10 +140,88 @@ export async function getRelatedBooks(
   return related;
 }
 
-/** Get work details */
+export interface OLWorkLink {
+  title: string;
+  url: string;
+}
+
+export interface OLWorkExcerpt {
+  excerpt?: string;
+  comment?: string;
+}
+
+/** Get author by key (e.g. OL26320A) */
+export async function getAuthorById(
+  authorKey: string
+): Promise<{ name: string; personal_name?: string; bio?: string; birth_date?: string; death_date?: string; photos?: number[]; links?: { title: string; url: string }[]; top_work?: string; top_subjects?: string[] } | null> {
+  try {
+    const key = authorKey.startsWith('/authors/') ? authorKey : `/authors/${authorKey}`;
+    const data = await olFetch<{
+      name: string;
+      personal_name?: string;
+      bio?: string | { value: string };
+      birth_date?: string;
+      death_date?: string;
+      photos?: number[];
+      links?: { title: string; url: string }[];
+      top_work?: string;
+      top_subjects?: string[];
+    }>(`${key}.json`);
+    const bio = typeof data.bio === 'string' ? data.bio : data.bio?.value;
+    return { ...data, bio };
+  } catch {
+    return null;
+  }
+}
+
+/** Get author's works (via search for richer data) */
+export async function getAuthorWorks(
+  authorKey: string,
+  limit = 24
+): Promise<OpenLibraryBook[]> {
+  try {
+    const cleanKey = authorKey.replace(/^\/?authors\//, '');
+    const data = await olFetch<OpenLibrarySearchResponse>('/search.json', {
+      author_key: cleanKey,
+      limit,
+      fields: 'key,title,first_publish_year,cover_i,author_name',
+    });
+    return data.docs ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Get work ratings */
+export async function getBookRatings(
+  olid: string
+): Promise<{ average: number; count: number } | null> {
+  try {
+    const data = await olFetch<{ summary?: { average?: number; count?: number } }>(
+      `/works/${olid}/ratings.json`
+    );
+    const s = data.summary;
+    if (!s || s.count === 0) return null;
+    return { average: s.average ?? 0, count: s.count ?? 0 };
+  } catch {
+    return null;
+  }
+}
+
+/** Get work details including links, excerpts */
 export async function getBookByWorkId(
   workId: string
-): Promise<{ title: string; description?: string; subjects?: string[]; authors?: { author: { key: string }; type?: { key: string } }[]; first_publish_date?: string; covers?: number[] } | null> {
+): Promise<{
+  title: string;
+  description?: string;
+  subjects?: string[];
+  authors?: { author: { key: string }; type?: { key: string } }[];
+  first_publish_date?: string;
+  covers?: number[];
+  links?: OLWorkLink[];
+  excerpts?: OLWorkExcerpt[];
+  subject_people?: string[];
+} | null> {
   try {
     const data = await olFetch<{
       title: string;
@@ -136,6 +230,9 @@ export async function getBookByWorkId(
       authors?: { author: { key: string }; type?: { key: string } }[];
       first_publish_date?: string;
       covers?: number[];
+      links?: { title: string; url: string }[];
+      excerpts?: { excerpt?: string; comment?: string }[];
+      subject_people?: string[];
     }>(`/works/${workId}.json`);
     const description =
       typeof data.description === 'string'
@@ -145,6 +242,9 @@ export async function getBookByWorkId(
       ...data,
       description,
       subjects: data.subjects,
+      links: data.links,
+      excerpts: data.excerpts,
+      subject_people: data.subject_people,
     };
   } catch {
     return null;

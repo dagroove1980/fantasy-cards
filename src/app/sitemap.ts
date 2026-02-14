@@ -4,14 +4,13 @@ import { getFantasyMoviesMultiPage, getFantasyTVMultiPage } from '@/lib/tmdb';
 import { getFantasyBooksMultiSubject, workId } from '@/lib/openlibrary';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [movies, books, series] = await Promise.all([
+  const [movies, series, booksResult] = await Promise.all([
     getFantasyMoviesMultiPage(10),
-    getFantasyBooksMultiSubject(
-      ['fantasy', 'high_fantasy', 'epic_fantasy'],
-      80
-    ),
     getFantasyTVMultiPage(5),
+    getFantasyBooksMultiSubject(['fantasy'], 60).catch(() => [] as { key: string }[]),
   ]);
+
+  const books = booksResult;
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },

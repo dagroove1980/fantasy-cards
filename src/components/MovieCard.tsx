@@ -52,6 +52,11 @@ export function MovieCard({ movie }: MovieCardProps) {
           {year}
           {genres ? ` · ${genres}` : ''}
         </p>
+        {movie.original_title && movie.original_title !== movie.title && (
+          <p className="text-xs text-secondary/80 mt-0.5 truncate" title={movie.original_title}>
+            {movie.original_title}
+          </p>
+        )}
       </div>
     </article>
   );

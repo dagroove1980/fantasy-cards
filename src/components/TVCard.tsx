@@ -52,6 +52,11 @@ export function TVCard({ series }: TVCardProps) {
           {year}
           {genres ? ` · ${genres}` : ''}
         </p>
+        {series.original_name && series.original_name !== series.name && (
+          <p className="text-xs text-secondary/80 mt-0.5 truncate" title={series.original_name}>
+            {series.original_name}
+          </p>
+        )}
       </div>
     </article>
   );

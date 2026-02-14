@@ -23,12 +23,41 @@ export interface TMDBMovie {
   popularity?: number;
 }
 
+export interface TMDBCredits {
+  cast: { id: number; name: string; character?: string; order?: number }[];
+  crew: { id: number; name: string; job: string }[];
+}
+
+export interface TMDBVideo {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+}
+
+export interface TMDBWatchProvider {
+  logo_path: string | null;
+  provider_id: number;
+  provider_name: string;
+}
+
+export interface TMDBWatchProviders {
+  link?: string;
+  flatrate?: TMDBWatchProvider[];
+  rent?: TMDBWatchProvider[];
+  buy?: TMDBWatchProvider[];
+}
+
 export interface TMDBMovieDetail extends TMDBMovie {
   genres: { id: number; name: string }[];
   runtime: number | null;
   tagline: string | null;
   homepage: string | null;
   imdb_id: string | null;
+  credits?: TMDBCredits;
+  videos?: { results: TMDBVideo[] };
+  'watch/providers'?: { results: { US?: TMDBWatchProviders } };
 }
 
 export interface TMDBSearchResponse<T> {
@@ -48,15 +77,28 @@ export interface TMDBSeries {
   vote_average: number;
   vote_count: number;
   genre_ids: number[];
+  original_name?: string;
 }
 
 export interface TMDBSeriesDetail extends TMDBSeries {
   genres: { id: number; name: string }[];
   number_of_seasons?: number;
   number_of_episodes?: number;
+  credits?: TMDBCredits;
+  videos?: { results: TMDBVideo[] };
+  'watch/providers'?: { results: { US?: TMDBWatchProviders } };
+}
+
+export interface TMDBSeriesWithIds extends TMDBSeriesDetail {
+  external_ids?: { imdb_id?: string | null };
 }
 
 export function posterUrl(path: string | null, size: 'w200' | 'w300' | 'w500' = 'w500'): string | null {
+  if (!path) return null;
+  return `${TMDB_IMAGE_BASE}/${size}${path}`;
+}
+
+export function backdropUrl(path: string | null, size: 'w300' | 'w780' | 'w1280' = 'w1280'): string | null {
   if (!path) return null;
   return `${TMDB_IMAGE_BASE}/${size}${path}`;
 }
@@ -129,10 +171,12 @@ export async function getFantasyMoviesFiltered(options: {
   return tmdbFetch('/discover/movie', params);
 }
 
-/** Fetch single movie by ID */
+/** Fetch single movie by ID with credits, videos, watch providers */
 export async function getMovieById(id: string): Promise<TMDBMovieDetail | null> {
   try {
-    return await tmdbFetch<TMDBMovieDetail>(`/movie/${id}`);
+    return await tmdbFetch<TMDBMovieDetail>(`/movie/${id}`, {
+      append_to_response: 'credits,videos,watch/providers',
+    });
   } catch {
     return null;
   }
@@ -169,10 +213,12 @@ export async function getFantasyTVMultiPage(pages = 5): Promise<TMDBSeries[]> {
   return all;
 }
 
-/** Fetch single TV show by ID */
-export async function getTVById(id: string): Promise<TMDBSeriesDetail | null> {
+/** Fetch single TV show by ID with credits, videos, watch providers, external_ids */
+export async function getTVById(id: string): Promise<TMDBSeriesWithIds | null> {
   try {
-    return await tmdbFetch<TMDBSeriesDetail>(`/tv/${id}`);
+    return await tmdbFetch<TMDBSeriesWithIds>(`/tv/${id}`, {
+      append_to_response: 'credits,videos,watch/providers,external_ids',
+    });
   } catch {
     return null;
   }

@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getTVById, getSimilarTV, posterUrl } from '@/lib/tmdb';
+import { getTVById, getSimilarTV, posterUrl, backdropUrl } from '@/lib/tmdb';
 import { SITE_URL } from '@/lib/constants';
 import type { Metadata } from 'next';
-import { Star, ArrowLeft } from 'lucide-react';
+import { Star, ArrowLeft, ExternalLink, Play, Film } from 'lucide-react';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -50,9 +50,17 @@ export default async function TVDetailPage({ params }: Props) {
   if (!show) notFound();
 
   const poster = posterUrl(show.poster_path);
+  const backdrop = backdropUrl(show.backdrop_path);
   const similar = similarRes.results?.filter((s) => s.id !== show.id).slice(0, 8) ?? [];
   const year = show.first_air_date?.slice(0, 4) || '';
   const genres = show.genres?.map((g) => g.name).join(', ') || '';
+  const creator = show.credits?.crew?.find((c) => c.job === 'Creator' || c.job === 'Executive Producer');
+  const cast = show.credits?.cast?.slice(0, 10) ?? [];
+  const trailer = show.videos?.results?.find(
+    (v) => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')
+  );
+  const watchProviders = show['watch/providers']?.results?.US;
+  const imdbId = show.external_ids?.imdb_id;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -94,16 +102,31 @@ export default async function TVDetailPage({ params }: Props) {
         }}
       />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link
-          href="/tv"
-          className="inline-flex items-center gap-1 text-sm text-secondary hover:text-accent mb-6"
-        >
-          <ArrowLeft size={16} />
-          Back to TV shows
-        </Link>
+      <div className="max-w-4xl mx-auto">
+        {backdrop && (
+          <div className="relative h-48 sm:h-64 -mt-4 -mx-4 sm:-mx-0 sm:rounded-t-xl overflow-hidden">
+            <Image
+              src={backdrop}
+              alt=""
+              fill
+              className="object-cover object-top"
+              priority
+              sizes="(max-width: 640px) 100vw, 896px"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          </div>
+        )}
 
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="px-4 py-8">
+          <Link
+            href="/tv"
+            className="inline-flex items-center gap-1 text-sm text-secondary hover:text-accent mb-6"
+          >
+            <ArrowLeft size={16} />
+            Back to TV shows
+          </Link>
+
+          <div className="flex flex-col md:flex-row gap-8">
           {poster && (
             <div className="relative w-full md:w-64 shrink-0 aspect-[2/3] rounded-[var(--radius-card)] overflow-hidden border border-border">
               <Image
@@ -131,20 +154,105 @@ export default async function TVDetailPage({ params }: Props) {
                 {show.number_of_episodes && `${show.number_of_episodes} episodes`}
               </p>
             )}
-            <div className="flex items-center gap-2 mt-4">
-              <Star size={20} className="text-accent fill-accent" />
-              <span className="font-semibold">{show.vote_average.toFixed(1)}</span>
-              <span className="text-secondary text-sm">({show.vote_count} votes)</span>
+            <div className="flex flex-wrap gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <Star size={20} className="text-accent fill-accent" />
+                <span className="font-semibold">{show.vote_average.toFixed(1)}</span>
+                <span className="text-secondary text-sm">({show.vote_count} votes)</span>
+              </div>
+              {imdbId && (
+                <a
+                  href={`https://www.imdb.com/title/${imdbId}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
+                >
+                  <ExternalLink size={14} />
+                  View on IMDB
+                </a>
+              )}
             </div>
             <p className="text-foreground/90 mt-4 leading-relaxed">{show.overview}</p>
+            {creator && (
+              <p className="text-foreground/80 mt-4 text-sm">
+                <span className="text-secondary">Created by</span> {creator.name}
+              </p>
+            )}
             <p className="text-foreground/80 mt-6 text-sm">
               Explore more fantasy TV shows in our curated collection.
             </p>
           </div>
         </div>
 
+        {trailer && (
+          <section className="px-4 mt-8">
+            <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Play size={20} />
+              Trailer
+            </h2>
+            <div className="aspect-video max-w-2xl rounded-lg overflow-hidden border border-border">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer.key}?rel=0`}
+                title={trailer.name}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </section>
+        )}
+
+        {cast.length > 0 && (
+          <section className="px-4 mt-8">
+            <h2 className="font-heading text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Film size={20} />
+              Cast
+            </h2>
+            <p className="text-foreground/80 text-sm">
+              {cast.map((c) => c.name).join(' · ')}
+            </p>
+          </section>
+        )}
+
+        {watchProviders &&
+          (watchProviders.flatrate?.length || watchProviders.rent?.length || watchProviders.buy?.length) && (
+          <section className="px-4 mt-8">
+            <h2 className="font-heading text-xl font-semibold text-foreground mb-4">
+              Where to watch
+            </h2>
+            <div className="flex flex-wrap gap-4">
+              {watchProviders.flatrate?.map((p) => (
+                <span key={p.provider_id} className="text-sm text-foreground/80" title="Stream">
+                  {p.provider_name}
+                </span>
+              ))}
+              {watchProviders.rent?.map((p) => (
+                <span key={p.provider_id} className="text-sm text-foreground/80" title="Rent">
+                  {p.provider_name} (rent)
+                </span>
+              ))}
+              {watchProviders.buy?.map((p) => (
+                <span key={p.provider_id} className="text-sm text-foreground/80" title="Buy">
+                  {p.provider_name} (buy)
+                </span>
+              ))}
+            </div>
+            {watchProviders.link && (
+              <a
+                href={watchProviders.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-sm text-accent hover:underline mt-2"
+              >
+                <ExternalLink size={14} />
+                Check availability on JustWatch
+              </a>
+            )}
+          </section>
+        )}
+
         {similar.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-12 px-4">
             <h2 className="font-heading text-xl font-semibold text-foreground mb-4">
               More like this
             </h2>
@@ -185,6 +293,7 @@ export default async function TVDetailPage({ params }: Props) {
             </div>
           </section>
         )}
+        </div>
       </div>
     </>
   );

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { OpenLibraryBook } from '@/lib/openlibrary';
 import { coverUrl, workId } from '@/lib/openlibrary';
+import { Star } from 'lucide-react';
 
 interface BookCardProps {
   book: OpenLibraryBook;
@@ -11,7 +12,11 @@ export function BookCard({ book }: BookCardProps) {
   const cover = coverUrl(book.cover_i);
   const id = workId(book.key);
   const author = book.author_name?.[0] || 'Unknown';
+  const authorKey = book.author_key?.[0];
   const year = book.first_publish_year?.toString() || '';
+  const rating = book.ratings_average;
+  const pages = book.number_of_pages_median;
+  const ebook = book.ebook_access === 'borrowable' || book.ebook_access === 'public';
 
   return (
     <article className="rounded-[var(--radius-card)] bg-card overflow-hidden border border-border shadow-[var(--shadow-card)] transition-lift">
@@ -31,6 +36,12 @@ export function BookCard({ book }: BookCardProps) {
               {book.title}
             </div>
           )}
+          {(rating !== undefined && rating > 0) && (
+            <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/70 px-2 py-1 rounded text-sm">
+              <Star size={14} className="text-accent fill-accent" />
+              <span>{rating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
       </Link>
       <div className="p-3">
@@ -40,9 +51,21 @@ export function BookCard({ book }: BookCardProps) {
           </h3>
         </Link>
         <p className="text-xs text-secondary mt-1 line-clamp-1">
-          {author}
+          {authorKey ? (
+            <Link href={`/authors/${authorKey}`} className="hover:text-accent">
+              {author}
+            </Link>
+          ) : (
+            author
+          )}
           {year ? ` (${year})` : ''}
         </p>
+        {(pages || ebook) && (
+          <p className="text-xs text-secondary mt-0.5 flex gap-2">
+            {pages && <span>{pages} pg</span>}
+            {ebook && <span className="text-accent">Read online</span>}
+          </p>
+        )}
       </div>
     </article>
   );
