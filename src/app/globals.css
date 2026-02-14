@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #0F1419;
+  --color-foreground: #E8EDF2;
+  --color-secondary: #8B9AA8;
+  --color-accent: #D4A853;
+  --color-card: #1A2332;
+  --color-border: #2D3A4A;
+  --color-page-bg: #0F1419;
+
+  --font-heading: var(--font-cinzel);
+  --font-body: var(--font-inter);
+
+  --radius-card: 12px;
+  --radius-pill: 20px;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+body {
+  background-color: var(--color-page-bg);
+  color: var(--color-foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), Georgia, serif;
+  letter-spacing: 0.02em;
+}
+
+.transition-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transition-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
