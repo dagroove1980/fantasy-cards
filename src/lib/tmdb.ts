@@ -70,7 +70,7 @@ export async function getFantasyMovies(page = 1): Promise<TMDBSearchResponse<TMD
 }
 
 /** Fetch multiple pages of fantasy movies for larger catalog */
-export async function getFantasyMoviesMultiPage(pages = 5): Promise<TMDBMovie[]> {
+export async function getFantasyMoviesMultiPage(pages = 10): Promise<TMDBMovie[]> {
   const all: TMDBMovie[] = [];
   const seen = new Set<number>();
 

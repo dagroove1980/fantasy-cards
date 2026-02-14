@@ -11,7 +11,7 @@ export const revalidate = 3600; // 1 hour
 export const metadata = {
   title: 'Fantasy Cards — Fantasy Movies, Books & TV Shows',
   description:
-    'Discover the best fantasy movies, books, and TV shows. Curated collection with 100+ films and 200+ novels. Filter by genre, author, rating, and decade. Find your next fantasy obsession.',
+    'Discover the best fantasy movies, books, and TV shows. 200+ films, 275+ novels. Filter by genre, author, rating, decade. Find your next fantasy obsession.',
   openGraph: {
     title: `${SITE_NAME} — Fantasy Movies, Books & TV`,
     url: SITE_URL,
@@ -36,7 +36,7 @@ export default async function HomePage() {
         </h1>
         <p className="text-lg text-secondary max-w-2xl mx-auto mb-6">
           Discover the best fantasy movies, books, and TV shows. Curated picks with ratings, 
-          filters, and search. Over 100 films and 200+ novels to explore.
+          filters, and search. Over 200 films and 275+ novels to explore.
         </p>
         <p className="text-sm text-secondary/80 max-w-xl mx-auto">
           From epic fantasy films like Lord of the Rings to beloved book series by Brandon Sanderson and George R.R. Martin. 

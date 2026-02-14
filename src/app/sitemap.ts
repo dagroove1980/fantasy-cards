@@ -5,10 +5,10 @@ import { getFantasyBooksMultiSubject, workId } from '@/lib/openlibrary';
 import { FANTASY_SUBJECTS } from '@/lib/constants';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const movies = await getFantasyMoviesMultiPage(5);
+  const movies = await getFantasyMoviesMultiPage(10);
   const books = await getFantasyBooksMultiSubject(
     ['fantasy', 'high_fantasy', 'epic_fantasy'],
-    40
+    80
   );
 
   const staticPages: MetadataRoute.Sitemap = [

@@ -14,8 +14,8 @@ interface Props {
 
 export async function generateStaticParams() {
   const { getFantasyMoviesMultiPage } = await import('@/lib/tmdb');
-  const movies = await getFantasyMoviesMultiPage(5);
-  return movies.slice(0, 100).map((m) => ({ id: String(m.id) }));
+  const movies = await getFantasyMoviesMultiPage(10);
+  return movies.slice(0, 200).map((m) => ({ id: String(m.id) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

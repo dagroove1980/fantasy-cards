@@ -16,9 +16,9 @@ export async function generateStaticParams() {
   const { getFantasyBooksMultiSubject, workId } = await import('@/lib/openlibrary');
   const books = await getFantasyBooksMultiSubject(
     ['fantasy', 'high_fantasy', 'epic_fantasy'],
-    50
+    90
   );
-  return books.slice(0, 150).map((b) => ({ olid: workId(b.key) }));
+  return books.slice(0, 250).map((b) => ({ olid: workId(b.key) }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

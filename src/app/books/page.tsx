@@ -7,18 +7,21 @@ import { SITE_URL } from '@/lib/constants';
 export const revalidate = 3600;
 
 export const metadata = {
-  title: 'Fantasy Books — Browse 200+ Fantasy Novels',
+  title: 'Fantasy Books — Browse 275+ Fantasy Novels',
   description:
-    'Explore the best fantasy books and series. Filter by sub-genre (epic fantasy, dark fantasy, urban fantasy), author, or publication decade. Find your next favorite fantasy novel.',
+    'Explore the best fantasy books and series. Over 275 novels. Filter by sub-genre (epic fantasy, dark fantasy, urban fantasy), author, or publication decade.',
   openGraph: {
     title: 'Fantasy Books | Fantasy Cards',
-    description: 'Browse 200+ fantasy novels. Filter by author, sub-genre, decade. Epic fantasy, dark fantasy, and more.',
+    description: 'Browse 275+ fantasy novels. Filter by author, sub-genre, decade. Epic fantasy, dark fantasy, and more.',
     url: `${SITE_URL}/books`,
   },
 };
 
 export default async function BooksPage() {
-  const books = await getFantasyBooksMultiSubject([...FANTASY_SUBJECTS], 35);
+  const books = await getFantasyBooksMultiSubject(
+    ['fantasy', 'high_fantasy', 'epic_fantasy', 'dark_fantasy', 'urban_fantasy'],
+    55
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -27,7 +30,7 @@ export default async function BooksPage() {
           Fantasy Books
         </h1>
         <p className="text-secondary mt-2 max-w-2xl">
-          A curated collection of over 200 fantasy novels from epic fantasy to urban fantasy. 
+          A curated collection of over 275 fantasy novels from epic fantasy to urban fantasy. 
           Discover works by Brandon Sanderson, George R.R. Martin, and more. Filter by sub-genre, 
           author, or decade to find your next read.
         </p>

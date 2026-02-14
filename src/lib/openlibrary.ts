@@ -71,7 +71,7 @@ export async function getFantasyBooksMultiSubject(
   const seen = new Set<string>();
 
   for (let i = 0; i < subjects.length; i++) {
-    if (i > 0) await delay(500); // Throttle to avoid Open Library 429
+    if (i > 0) await delay(1200); // Throttle to avoid Open Library 429
     const res = await getFantasyBooks(subjects[i], 1, limitPerSubject);
     for (const doc of res.docs) {
       const id = doc.key;
