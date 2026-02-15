@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: `${SITE_NAME} — Fantasy Movies, Books & TV`,
     template: `%s | ${SITE_NAME}`,
   },
-    description:
+  description:
     'Discover the best fantasy movies and books. 200+ films, 275+ novels. Filter by genre, author, rating, decade. Epic fantasy, dark fantasy, urban fantasy. Free curated recommendations.',
   metadataBase: new URL(SITE_URL),
   openGraph: {
