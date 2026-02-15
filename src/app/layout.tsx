@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Cinzel, Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
@@ -52,6 +53,12 @@ export default function RootLayout({
       className={`${cinzel.variable} ${inter.variable}`}
     >
       <body className="min-h-screen antialiased">
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3452665186406442"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Header />
         <main className="min-h-screen">{children}</main>
         <Footer />
