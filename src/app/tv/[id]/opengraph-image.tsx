@@ -27,7 +27,7 @@ export default async function Image({
           fontSize: 24,
         }}
       >
-        Fantasy Cards
+        FantasyMovies
       </div>,
       { ...size }
     );

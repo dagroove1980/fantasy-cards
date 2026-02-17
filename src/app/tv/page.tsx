@@ -10,7 +10,7 @@ export const metadata = {
   description:
     'Discover the best fantasy TV shows. Game of Thrones, The Witcher, House of the Dragon. Filter by genre, rating, decade.',
   openGraph: {
-    title: 'Fantasy TV Shows | Fantasy Cards',
+    title: 'Fantasy TV Shows | FantasyMovies',
     description: 'Browse 100+ fantasy TV series. Filter by genre, rating, decade.',
     url: `${SITE_URL}/tv`,
   },

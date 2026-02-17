@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export const alt = 'Fantasy Cards — Movies, Books & TV';
+export const alt = 'FantasyMovies — Movies, Books & TV';
 export const size = {
     width: 1200,
     height: 630,
@@ -73,7 +73,7 @@ export default async function Image() {
                         alignItems: 'center',
                     }}
                 >
-                    Fantasy Cards
+                    FantasyMovies
                 </div>
 
                 <div

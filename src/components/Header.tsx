@@ -11,7 +11,7 @@ export function Header() {
             className="flex items-center gap-2 font-heading text-lg font-bold"
           >
             <span className="text-foreground">Fantasy</span>
-            <span className="text-accent">.cards</span>
+            <span className="text-accent">Movies</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-secondary">

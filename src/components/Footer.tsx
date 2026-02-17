@@ -6,7 +6,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-secondary">
           <Link href="/" className="font-heading font-bold text-foreground hover:text-accent">
-            Fantasy.cards
+            FantasyMovies
           </Link>
           <div className="flex gap-6">
             <Link href="/movies" className="hover:text-foreground transition-colors">
@@ -24,7 +24,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-4 text-xs text-secondary/80 text-center sm:text-left">
-          Data from TMDB and Open Library. Fantasy.cards is not affiliated with these services.
+          Data from TMDB and Open Library. FantasyMovies is not affiliated with these services.
         </p>
       </div>
     </footer>

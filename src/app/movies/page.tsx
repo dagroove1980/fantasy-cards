@@ -10,7 +10,7 @@ export const metadata = {
   description:
     'Discover the best fantasy movies of all time. Over 200 films. Filter by genre, rating, and decade. From epic adventures to dark fantasy, find your next favorite film.',
   openGraph: {
-    title: 'Fantasy Movies | Fantasy Cards',
+    title: 'Fantasy Movies | FantasyMovies',
     description: 'Browse 200+ fantasy films. Filter by genre, rating, decade. Epic adventures, dark fantasy, and more.',
     url: `${SITE_URL}/movies`,
   },

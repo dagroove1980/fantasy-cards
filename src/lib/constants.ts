@@ -1,9 +1,8 @@
-export const SITE_NAME = 'Fantasy Cards';
+export const SITE_NAME = 'FantasyMovies';
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'https://fantasy-cards.vercel.app');
+    : 'https://fantasy-movies.com';
 export const SITE_DESCRIPTION =
   'Discover fantasy movies, books, and TV shows. Curated picks with ratings, trailers, and where to watch.';
 

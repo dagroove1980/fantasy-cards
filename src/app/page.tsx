@@ -10,7 +10,7 @@ import { SITE_NAME, SITE_URL } from '@/lib/constants';
 export const revalidate = 3600; // 1 hour
 
 export const metadata = {
-  title: 'Fantasy Cards — Fantasy Movies, Books & TV Shows',
+  title: 'FantasyMovies — Fantasy Movies, Books & TV Shows',
   description:
     'Discover the best fantasy movies, books, and TV shows. 200+ films, 275+ novels. Filter by genre, author, rating, decade. Find your next fantasy obsession.',
   openGraph: {
@@ -35,7 +35,7 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="text-center mb-16">
         <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground mb-4">
-          Fantasy <span className="text-accent">.cards</span>
+          Fantasy<span className="text-accent">Movies</span>
         </h1>
         <p className="text-lg text-secondary max-w-2xl mx-auto mb-6">
           Discover the best fantasy movies, books, and TV shows. Curated picks with ratings, 

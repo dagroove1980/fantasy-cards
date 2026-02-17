@@ -11,7 +11,7 @@ export const metadata = {
   description:
     'Explore the best fantasy books and series. Over 275 novels. Filter by sub-genre (epic fantasy, dark fantasy, urban fantasy), author, or publication decade.',
   openGraph: {
-    title: 'Fantasy Books | Fantasy Cards',
+    title: 'Fantasy Books | FantasyMovies',
     description: 'Browse 275+ fantasy novels. Filter by author, sub-genre, decade. Epic fantasy, dark fantasy, and more.',
     url: `${SITE_URL}/books`,
   },
