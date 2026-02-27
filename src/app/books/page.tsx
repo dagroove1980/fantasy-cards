@@ -4,7 +4,7 @@ import { BooksWithFilters } from '@/components/BooksWithFilters';
 import { FANTASY_SUBJECTS } from '@/lib/constants';
 import { SITE_URL } from '@/lib/constants';
 
-export const revalidate = 3600;
+export const revalidate = 604800; // 1 week
 
 export const metadata = {
   title: 'Fantasy Books — Browse 275+ Fantasy Novels',

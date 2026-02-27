@@ -3,7 +3,7 @@ import { SITE_URL } from '@/lib/constants';
 import { getFantasyMoviesMultiPage, getFantasyTVMultiPage } from '@/lib/tmdb';
 import { getFantasyBooksMultiSubject, workId } from '@/lib/openlibrary';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 604800; // 1 week
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [

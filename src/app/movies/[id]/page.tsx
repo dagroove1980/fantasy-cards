@@ -10,6 +10,8 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+export const revalidate = 604800; // 1 week
+
 export async function generateStaticParams() {
   const { getFantasyMoviesMultiPage } = await import('@/lib/tmdb');
   const movies = await getFantasyMoviesMultiPage(10);

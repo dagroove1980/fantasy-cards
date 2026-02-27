@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 import { getMovieById } from '@/lib/tmdb';
 import { posterUrl } from '@/lib/tmdb';
 
+export const revalidate = 604800; // 1 week
 export const alt = 'Fantasy movie';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

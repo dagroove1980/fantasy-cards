@@ -7,7 +7,7 @@ import { BookCard } from '@/components/BookCard';
 import { TVCard } from '@/components/TVCard';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from '@/lib/constants';
 
-export const revalidate = 3600; // 1 hour
+export const revalidate = 604800; // 1 week
 
 export const metadata = {
   title: 'FantasyMovies — Fantasy Movies, Books & TV Shows',

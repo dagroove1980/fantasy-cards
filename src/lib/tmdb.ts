@@ -114,7 +114,7 @@ async function tmdbFetch<T>(path: string, params?: Record<string, string | numbe
   }
 
   const res = await fetch(url.toString(), {
-    next: { revalidate: 3600 }, // 1 hour
+    next: { revalidate: 604800 }, // 1 week
   });
   if (!res.ok) throw new Error(`TMDB API error: ${res.status}`);
   return res.json();

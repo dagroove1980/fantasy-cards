@@ -3,7 +3,7 @@ import { getFantasyTVMultiPage } from '@/lib/tmdb';
 import { TVsWithFilters } from '@/components/TVsWithFilters';
 import { SITE_URL } from '@/lib/constants';
 
-export const revalidate = 3600;
+export const revalidate = 604800; // 1 week
 
 export const metadata = {
   title: 'Fantasy TV Shows — Browse 100+ Fantasy Series',

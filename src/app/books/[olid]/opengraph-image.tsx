@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getBookByWorkId } from '@/lib/openlibrary';
 
+export const revalidate = 604800; // 1 week
 export const alt = 'Fantasy book';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

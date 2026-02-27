@@ -10,6 +10,8 @@ interface Props {
   params: Promise<{ olid: string }>;
 }
 
+export const revalidate = 604800; // 1 week
+
 export async function generateStaticParams() {
   const { getFantasyBooksMultiSubject, workId } = await import('@/lib/openlibrary');
   const books = await getFantasyBooksMultiSubject(

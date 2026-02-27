@@ -3,7 +3,7 @@ import { getFantasyMoviesMultiPage } from '@/lib/tmdb';
 import { MoviesWithFilters } from '@/components/MoviesWithFilters';
 import { SITE_URL } from '@/lib/constants';
 
-export const revalidate = 3600;
+export const revalidate = 604800; // 1 week
 
 export const metadata = {
   title: 'Fantasy Movies — Browse 200+ Fantasy Films',

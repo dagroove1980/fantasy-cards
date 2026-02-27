@@ -46,7 +46,7 @@ async function olFetch<T>(path: string, params?: Record<string, string | number>
   let lastError: Error | null = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     const res = await fetch(url.toString(), {
-      next: { revalidate: 3600 },
+      next: { revalidate: 604800 }, // 1 week
     });
     if (res.ok) return res.json();
 

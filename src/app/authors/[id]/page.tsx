@@ -9,6 +9,8 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+export const revalidate = 604800; // 1 week
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const author = await getAuthorById(id);
